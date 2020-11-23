@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑文件</title>
+</head>
+
+<body>
+<span>
+    <h5>当前文件名称：</h5>
+    <p th:text="${oldName}"></p>
+</span>
+<br>
+<form action="/adm/update" method="post">
+
+
+    <div>
+        <input type="hidden" name="oldName" th:value="${oldName}" readonly="readonly"/>
+    </div>
+    <div>
+        <label>新文件名</label>
+        <input type="text" name="newName" />
+    </div>
+    <div>
+        <input type="submit" value="提交" />
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+    <script type="text/javascript" src="/js/jquery-3.5.1.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        //生成进度条
+
+        function getState(seq,fileSize,maxBlock) {
+            //获取所有需要的元素
+
+            var percent = document.getElementById("percent");
+            var hasFinish = (seq - 1) * maxBlock * 100;
+            $.ajax({
+                url: '/upload/FileUploadStatus',
+                type: 'POST',
+                cache: false,
+                success:function (result) {
+                    //计算百分比，保留一位小数
+                    if(parseInt(10*(parseInt(result) + hasFinish) / fileSize)/10 > 99.9){
+                        percent.innerText = "99.9 %";
+                    }else {
+                        percent.innerText = parseInt(10 * (parseInt(result) + hasFinish) / fileSize) / 10 + "%";
+                    }
+                }
+            });
+        }
+
+        function uploadByPart(seek,seq) {
+            var htmlFileSize = document.getElementById("fileSize");
+            var htmlFileName = document.getElementById("fileName");
+            var htmlState = document.getElementById("state");
+            var percent = document.getElementById("percent");
+            document.getElementById("1").innerText = "文件名称";
+            document.getElementById("2").innerText = "文件大小";
+            document.getElementById("3").innerText = "当前状态";
+            document.getElementById("4").innerText = "上传进度";
+            //seek为偏移量指针，seq为序号
+            //大文件分块50MB
+            const maxBlock = 1024*1024*50;
+            var id = "[[${uid}]]";
+            var file = document.getElementById("uploadFile").files[0];
+            var fileName = file.name;
+            var fileType = file.type;
+            var fileSize = file.size;
+
+            htmlFileName.innerText = fileName;
+            htmlFileSize.innerText = fileSize.toString() + " 字节";
+            htmlState.innerText = "上传中";
+            //上传参数
+            var start = seek;
+            var end = seek + maxBlock;
+            if(end>fileSize){
+                end = fileSize;
+            }
+            var fileBytes = file.slice(start,end);
+            formData = new FormData();
+            formData.append("file",fileBytes);
+            formData.append('fileName',fileName);
+            formData.append('seq',seq);
+
+            var idW = window.setInterval(function () {
+                getState(seq,fileSize,maxBlock)
+            },100);
+
+            //ajax发送数据
+            $.ajax({
+                    url: '/upload/FileUpload',
+                    type: 'POST',
+                    cache: false,
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                }
+            ).done(
+                function (result) {
+                    //停止本轮
+                    window.clearInterval(idW);
+
+                    start = start + maxBlock;
+                    if(start>=fileSize){
+                        percent.innerText =  "99.9%";
+                        //结束,发送重组信息
+                        $.ajax({
+                                url: '/upload/recombination',
+                                type: 'POST',
+                                cache: false,
+                                data: {
+                                    fileName:fileName,
+                                    id:id,
+                                    n:seq
+                                }
+                            }
+                        ).done(
+                            function (result) {
+                                if(result.code===200){
+                                    //成功结束上传
+                                    htmlState.innerText = "上传成功";
+                                    percent.innerText = "100.0%";
+                                }else{
+                                    //失败
+                                    htmlState.innerText = "上传失败";
+                                }
+                            }
+                        )
+                    }else{
+                        uploadByPart(start,seq + 1);
+                    }
+                }
+            );
+
+
+        }
+
+
+
+    </script>
+</head>
+<body>
+    <div id="upload">
+        <form enctype="multipart/form-data" >
+            <input type="file" id="uploadFile" name="uploadFile" />
+            <input type="button" onclick="uploadByPart(0,1)" value="提交">
+        </form>
+    </div>
+    <div id="progress">
+        <label id="1"></label>
+        <span id="fileName"></span>
+        <br>
+        <label id="2"></label>
+        <span id="fileSize"></span>
+        <br>
+        <label id="3"></label>
+        <span id="state"></span>
+        <br>
+        <label id="4"></label>
+        <span id="percent"></span>
+    </div>
+    <br>
+    <a href = "/adm/select">
+        <button>返回主页面</button>
+    </a>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqujava.uploadfile.Services.fileAdm.filePCMMapper">
+  <resultMap id="BaseResultMap" type="com.cqujava.uploadfile.Services.fileAdm.filePCM">
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="lastEditDate" jdbcType="VARCHAR" property="lasteditdate" />
+    <result column="uploadDate" jdbcType="VARCHAR" property="uploaddate" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cqujava.uploadfile.Services.fileAdm.filePCM">
+    insert into filepcm (path, lastEditDate, uploadDate
+      )
+    values (#{path,jdbcType=VARCHAR}, #{lasteditdate,jdbcType=VARCHAR}, #{uploaddate,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.cqujava.uploadfile.Services.fileAdm.filePCM">
+    insert into filepcm
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="path != null">
+        path,
+      </if>
+      <if test="lasteditdate != null">
+        lastEditDate,
+      </if>
+      <if test="uploaddate != null">
+        uploadDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="lasteditdate != null">
+        #{lasteditdate,jdbcType=VARCHAR},
+      </if>
+      <if test="uploaddate != null">
+        #{uploaddate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="selectById" parameterType = "java.lang.String" resultMap="BaseResultMap">
+    select * from filePCM where path = #{path,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="delete" parameterType="java.lang.String">
+    delete from filePCM where path = #{path,jdbcType=VARCHAR}
+  </delete>
+
+  <update id="update" parameterType="com.cqujava.uploadfile.Services.fileAdm.filePCM">
+    update filePCM set
+    path=#{path,jdbcType=VARCHAR},
+    uploadDate= #{uploaddate,jdbcType=VARCHAR},
+    lastEditDate=#{lasteditdate,jdbcType=VARCHAR}
+    where path=#{path,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

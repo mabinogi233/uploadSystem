@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>查看个人上传的文件</title>
+    <style>
+        table{border-collapse:collapse;}
+        table,th, td{border: 1px solid black;padding: 5px;text-align: center;}
+    </style>
+</head>
+<body>
+<a href="/user/logout">
+    <button>退出登录</button>
+</a>
+<br>
+<br>
+<a href="/upload/index"><button>点击上传文件</button></a>
+<br>
+<br>
+<table>
+    <thead>
+    <th width="20%">文件名</th>
+    <th width="20%">上传时间</th>
+    <th width="20%">最后修改日期</th>
+    <th width="20%">大小</th>
+    <th width="20%">操作</th>
+    </thead>
+    <tbody>
+    <!--/*@thymesVar id="books" type="java.util.List"*/-->
+    <tr th:each="oneFile,stat : ${files}">
+        <td th:text="${oneFile['name']}"></td>
+        <td th:text="${oneFile['uploadDate']}"></td>
+        <td th:text="${oneFile['lastEditDate']}"></td>
+        <td th:text="${oneFile['size']}"></td>
+        <td>
+            <a th:href="@{/adm/edit(path=${oneFile['name']})}">编辑</a> &nbsp;&nbsp;
+            <a th:href="@{/adm/delete(path=${oneFile['name']})}">删除</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
