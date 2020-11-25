@@ -5,6 +5,7 @@ import com.cqujava.uploadfile.Services.fileAdm.filePCM;
 import com.cqujava.uploadfile.Services.fileAdm.filePCMMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Transactional
 public class uploadServices {
 
     @Autowired
